@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trade Journal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=Nunito:wght@300;400;500;600;700&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div class="deco-dots"></div>
+<div class="deco-circle"></div>
+
+<header>
+  <div class="logo">
+    <div class="logo-text">Trade <span>Journal</span></div>
+    <div class="logo-dot"></div>
+    <div class="logo-sub">My Trading Log</div>
+  </div>
+  <div class="header-stats">
+    <div class="hstat"><div class="hstat-label">Total Trades</div><div class="hstat-value pink" id="h-total">0</div></div>
+    <div class="hstat"><div class="hstat-label">Win Rate</div><div class="hstat-value" id="h-wr">—</div></div>
+    <div class="hstat"><div class="hstat-label">Total P&L</div><div class="hstat-value" id="h-pnl">$0.00</div></div>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="goTab('calendar',this)">📅 Calendar</button>
+  <button class="tab" onclick="goTab('log',this)">✏️ Log Trade</button>
+  <button class="tab" onclick="goTab('history',this)">📋 History</button>
+  <button class="tab" onclick="goTab('stats',this)">✨ Stats</button>
+</div>
+
+<main>
+
+<!-- ══════════ CALENDAR ══════════ -->
+  <div class="panel active" id="panel-calendar">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:8px;">
+      <div>
+        <div class="page-title">Trading Calendar 🌸</div>
+        <div class="page-sub">Green days = profitable 💚 · Red days = losses 🔴 · Track your streaks!</div>
+      </div>
+      <div class="cal-nav" style="margin-bottom:0;">
+        <div style="display:flex;align-items:baseline;gap:8px;margin-right:16px;">
+          <span class="cal-month" id="cal-month-label">March</span>
+          <span class="cal-year" id="cal-year-label">2026</span>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <button class="nav-btn" onclick="changeMonth(-1)">‹</button>
+          <button class="nav-btn" onclick="changeMonth(1)">›</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="cal-legend">
+      <div class="leg-item"><div class="leg-dot w"></div>Win Day</div>
+      <div class="leg-item"><div class="leg-dot l"></div>Loss Day</div>
+      <div class="leg-item"><div class="leg-dot n"></div>No Trades</div>
+    </div>
+
+    <div class="card" style="padding:20px;">
+      <div class="cal-grid-header">
+        <div class="cal-dow">Sun</div><div class="cal-dow">Mon</div><div class="cal-dow">Tue</div>
+        <div class="cal-dow">Wed</div><div class="cal-dow">Thu</div><div class="cal-dow">Fri</div><div class="cal-dow">Sat</div>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+    </div>
+
+    <div class="weekly-section">
+      <div class="weekly-title">Weekly P&L Breakdown</div>
+      <div class="week-cards" id="week-cards">
+        <div class="empty" style="padding:30px 0;"><div class="empty-sub" style="font-style:italic">Log trades to see weekly breakdown</div></div>
+      </div>
+    </div>
+  </div>
+
+  
+
+  <!-- LOG -->
+  <div class="panel" id="panel-log">
+    <div class="page-title">Log a New Trade 🌸</div>
+    <div class="page-sub">Fill in every field — your future self will thank you for it</div>
+
+    <div class="card">
+      <div class="block-label">Trade Details</div>
+      <div class="form-grid-3">
+        <div class="field"><label>Date</label><input type="date" id="f-date"></div>
+        <div class="field"><label>Ticker</label><input type="text" id="f-ticker" placeholder="SPY, QQQ, AAPL..."></div>
+        <div class="field"><label>Direction</label>
+          <select id="f-direction">
+            <option value="">Choose direction...</option>
+            <option value="CALL">↑ CALL — Bullish</option>
+            <option value="PUT">↓ PUT — Bearish</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid-3">
+        <div class="field"><label>Strike Price ($)</label><input type="number" id="f-strike" placeholder="e.g. 580"></div>
+        <div class="field"><label>Expiration Date</label><input type="date" id="f-expiry"></div>
+        <div class="field"><label>Contracts</label><input type="number" id="f-contracts" value="1" min="1"></div>
+      </div>
+      <div class="form-grid-3">
+        <div class="field"><label>Entry Price (premium $)</label><input type="number" id="f-entry" placeholder="e.g. 1.50" step="0.01"></div>
+        <div class="field"><label>Exit Price (premium $)</label><input type="number" id="f-exit" placeholder="e.g. 2.10" step="0.01"></div>
+        <div class="field"><label>P&L (auto-calculated)</label><input type="text" id="f-pnl-calc" readonly placeholder="Fill entry & exit..."></div>
+      </div>
+      <div class="form-grid-3">
+        <div class="field"><label>Entry Time</label><input type="time" id="f-entry-time"></div>
+        <div class="field"><label>Exit Time</label><input type="time" id="f-exit-time"></div>
+        <div class="field" style="grid-column:1/-1;"><label>Setup Type(s)</label>
+          <div class="setup-pill-grid" id="setup-grid">
+        <button class="setup-pill" onclick="togglePill(this)">Opening Range Breakout</button>
+        <button class="setup-pill" onclick="togglePill(this)">VWAP Bounce</button>
+        <button class="setup-pill" onclick="togglePill(this)">VWAP Rejection</button>
+        <button class="setup-pill" onclick="togglePill(this)">Support Bounce</button>
+        <button class="setup-pill" onclick="togglePill(this)">Resistance Rejection</button>
+        <button class="setup-pill" onclick="togglePill(this)">Bull Flag</button>
+        <button class="setup-pill" onclick="togglePill(this)">Bear Flag</button>
+        <button class="setup-pill" onclick="togglePill(this)">Double Bottom</button>
+        <button class="setup-pill" onclick="togglePill(this)">Double Top</button>
+        <button class="setup-pill" onclick="togglePill(this)">Other</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="block-label">How Were You Feeling? 💭</div>
+      <div class="pill-grid" id="emotion-grid">
+        <button class="pill" onclick="togglePill(this)">😤 Confident</button>
+        <button class="pill" onclick="togglePill(this)">😰 Nervous</button>
+        <button class="pill" onclick="togglePill(this)">😤 Frustrated</button>
+        <button class="pill" onclick="togglePill(this)">🎯 Focused</button>
+        <button class="pill" onclick="togglePill(this)">😵 Overwhelmed</button>
+        <button class="pill" onclick="togglePill(this)">🤑 Greedy</button>
+        <button class="pill" onclick="togglePill(this)">😨 Fear of Loss</button>
+        <button class="pill" onclick="togglePill(this)">🧘 Calm</button>
+        <button class="pill" onclick="togglePill(this)">💨 FOMO</button>
+        <button class="pill" onclick="togglePill(this)">😡 Revenge Mode</button>
+        <button class="pill" onclick="togglePill(this)">🌸 Patient</button>
+        <button class="pill" onclick="togglePill(this)">⚡ Impulsive</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="block-label-row">
+        <div class="block-label">Rules Checklist ✅</div>
+        <button class="edit-rules-link" onclick="openRulesModal()">✏️ Edit Rules</button>
+      </div>
+      <div class="rule-grid" id="rule-grid-dynamic">
+        <!-- Rules rendered dynamically by renderRuleGrid() -->
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="block-label">Grade This Trade 🎀</div>
+      <div class="grade-row">
+        <button class="grade-btn" onclick="pickGrade(this,'A')">A<span class="grade-sub">Perfect</span></button>
+        <button class="grade-btn" onclick="pickGrade(this,'B')">B<span class="grade-sub">Good</span></button>
+        <button class="grade-btn" onclick="pickGrade(this,'C')">C<span class="grade-sub">Okay</span></button>
+        <button class="grade-btn" onclick="pickGrade(this,'D')">D<span class="grade-sub">Poor</span></button>
+        <button class="grade-btn" onclick="pickGrade(this,'F')">F<span class="grade-sub">Broke Rules</span></button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="block-label">Reflection 📓</div>
+      <div class="form-grid-2">
+        <div class="field"><label>What happened?</label><textarea id="f-what" placeholder="Describe the trade — setup, entry, how it played out..."></textarea></div>
+        <div class="field"><label>What did you learn?</label><textarea id="f-lesson" placeholder="A lesson, pattern, or insight from this trade..."></textarea></div>
+      </div>
+      <div class="field"><label>What would you do differently?</label><textarea id="f-diff" placeholder="Specific changes you'd make next time..."></textarea></div>
+    </div>
+
+    <button class="save-btn" onclick="saveTrade()">💾 Save to Journal</button>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="panel" id="panel-history">
+    <div class="history-header">
+      <div>
+        <div class="page-title">Trade History 📋</div>
+        <div class="history-count" id="log-count">0 trades logged</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-ghost" onclick="exportTrades()">⬇ Export</button>
+        <label class="btn-ghost import-label">⬆ Import<input type="file" id="import-file" accept=".json" onchange="importTrades(event)" style="display:none"></label>
+        <button class="btn-ghost" onclick="window.print()">🖨 Print</button>
+        <button class="btn-ghost danger" onclick="clearAll()">🗑 Clear All</button>
+      </div>
+    </div>
+    <!-- backup banner -->
+    <div class="backup-banner">
+      <div class="backup-text">
+        <strong>💾 Backup Your Trades</strong>
+        <span>Export regularly so you never lose your data. Import to restore on any device.</span>
+      </div>
+      <div class="backup-btns">
+        <button class="backup-btn" onclick="exportTrades()">⬇ Export</button>
+        <label class="backup-btn import-btn import-label2">⬆ Import<input type="file" id="import-file2" accept=".json" onchange="importTrades(event)" style="display:none"></label>
+      </div>
+    </div>
+    <div id="trade-list"></div>
+  </div>
+
+  <!-- STATS -->
+  <div class="panel" id="panel-stats">
+    <div class="page-title">My Statistics ✨</div>
+    <div class="page-sub">Patterns in your data reveal patterns in your trading</div>
+    <div class="stats-top">
+      <div class="stat-box"><div class="stat-lbl">Total Trades</div><div class="stat-val pink" id="s-total">0</div><div class="stat-hint">all time</div></div>
+      <div class="stat-box"><div class="stat-lbl">Win Rate</div><div class="stat-val" id="s-wr">—</div><div class="stat-hint">target ≥ 45%</div></div>
+      <div class="stat-box"><div class="stat-lbl">Total P&L</div><div class="stat-val" id="s-pnl">$0</div><div class="stat-hint" id="s-wl-count">0 wins / 0 losses</div></div>
+      <div class="stat-box"><div class="stat-lbl">Avg Win / Loss</div><div class="stat-val nude" id="s-avg" style="font-size:1.3rem">—</div><div class="stat-hint">per trade</div></div>
+    </div>
+    <div class="stats-bottom">
+      <div class="stat-panel"><div class="stat-panel-title">Grade Distribution 🎀</div><div id="breakdown-grade"><div class="no-data">Log trades to see your grades</div></div></div>
+      <div class="stat-panel"><div class="stat-panel-title">Setup Performance 📊</div><div id="breakdown-setup"><div class="no-data">Log trades to see your setups</div></div></div>
+      <div class="stat-panel"><div class="stat-panel-title">Emotional Patterns 💭</div><div id="breakdown-emotion"><div class="no-data">Log trades to see your emotions</div></div></div>
+      <div class="stat-panel"><div class="stat-panel-title">Rules Followed Most ✅</div><div id="breakdown-rules"><div class="no-data">Log trades to see your rule stats</div></div></div>
+    </div>
+  </div>
+
+
+<!-- Editable Rules Modal -->
+<div class="modal-overlay" id="rules-modal">
+  <div class="modal">
+    <div class="modal-title">Edit Your Rules ✅</div>
+    <div class="modal-sub">Customise the checklist to match your trading strategy</div>
+    <div class="rule-edit-list" id="rule-edit-list"></div>
+    <button class="add-rule-btn" onclick="addRuleField()">+ Add a Rule</button>
+    <div class="modal-actions">
+      <button class="modal-cancel-btn" onclick="closeRulesModal()">Cancel</button>
+      <button class="modal-save-btn" onclick="saveRules()">Save Rules</button>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- Mobile bottom nav -->
+<div class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <button class="bnav-btn active" onclick="goTabMobile('calendar',this)"><span class="bicon">📅</span>Calendar</button>
+    <button class="bnav-btn" onclick="goTabMobile('log',this)"><span class="bicon">✏️</span>Log</button>
+    <button class="bnav-btn" onclick="goTabMobile('history',this)"><span class="bicon">📋</span>History</button>
+    <button class="bnav-btn" onclick="goTabMobile('stats',this)"><span class="bicon">✨</span>Stats</button>
+  </div>
+</div>
+
+<script src="js/app.js" defer></script>
+
+<!-- ══════════ EDIT TRADE MODAL ══════════ -->
+<div class="edit-modal-overlay" id="edit-modal">
+  <div class="edit-modal-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+      <div class="edit-modal-title">Edit Trade ✏️</div>
+      <button onclick="closeEditModal()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--text3);padding:4px 8px;border-radius:8px;">✕</button>
+    </div>
+
+    <div class="edit-modal-section">Trade Details</div>
+    <div class="form-grid-3" style="margin-bottom:12px;">
+      <div class="field"><label>Date</label><input type="date" id="e-date"></div>
+      <div class="field"><label>Ticker</label><input type="text" id="e-ticker" placeholder="SPY..."></div>
+      <div class="field"><label>Direction</label>
+        <select id="e-direction">
+          <option value="CALL">↑ CALL — Bullish</option>
+          <option value="PUT">↓ PUT — Bearish</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-grid-3" style="margin-bottom:12px;">
+      <div class="field"><label>Strike ($)</label><input type="number" id="e-strike"></div>
+      <div class="field"><label>Expiry</label><input type="date" id="e-expiry"></div>
+      <div class="field"><label>Contracts</label><input type="number" id="e-contracts" min="1"></div>
+    </div>
+    <div class="form-grid-3" style="margin-bottom:12px;">
+      <div class="field"><label>Entry Price ($)</label><input type="number" id="e-entry" step="0.01" oninput="calcEditPnl()"></div>
+      <div class="field"><label>Exit Price ($)</label><input type="number" id="e-exit" step="0.01" oninput="calcEditPnl()"></div>
+      <div class="field"><label>P&amp;L (auto)</label><input type="text" id="e-pnl-calc" readonly></div>
+    </div>
+    <div class="form-grid-3" style="margin-bottom:12px;">
+      <div class="field"><label>Entry Time</label><input type="time" id="e-entry-time"></div>
+      <div class="field"><label>Exit Time</label><input type="time" id="e-exit-time"></div>
+      <div class="field" style="grid-column:1/-1;"><label>Setup Type(s)</label>
+        <div class="setup-pill-grid" id="e-setup-grid">
+        <button class="setup-pill" onclick="togglePill(this)">Opening Range Breakout</button>
+        <button class="setup-pill" onclick="togglePill(this)">VWAP Bounce</button>
+        <button class="setup-pill" onclick="togglePill(this)">VWAP Rejection</button>
+        <button class="setup-pill" onclick="togglePill(this)">Support Bounce</button>
+        <button class="setup-pill" onclick="togglePill(this)">Resistance Rejection</button>
+        <button class="setup-pill" onclick="togglePill(this)">Bull Flag</button>
+        <button class="setup-pill" onclick="togglePill(this)">Bear Flag</button>
+        <button class="setup-pill" onclick="togglePill(this)">Double Bottom</button>
+        <button class="setup-pill" onclick="togglePill(this)">Double Top</button>
+        <button class="setup-pill" onclick="togglePill(this)">Other</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="edit-modal-section">How Were You Feeling? 💭</div>
+    <div class="pill-grid" id="e-emotion-grid">
+      <button class="pill" onclick="togglePill(this)">😤 Confident</button>
+      <button class="pill" onclick="togglePill(this)">😰 Nervous</button>
+      <button class="pill" onclick="togglePill(this)">😤 Frustrated</button>
+      <button class="pill" onclick="togglePill(this)">🎯 Focused</button>
+      <button class="pill" onclick="togglePill(this)">😵 Overwhelmed</button>
+      <button class="pill" onclick="togglePill(this)">🤑 Greedy</button>
+      <button class="pill" onclick="togglePill(this)">😨 Fear of Loss</button>
+      <button class="pill" onclick="togglePill(this)">🧘 Calm</button>
+      <button class="pill" onclick="togglePill(this)">💨 FOMO</button>
+      <button class="pill" onclick="togglePill(this)">😡 Revenge Mode</button>
+      <button class="pill" onclick="togglePill(this)">🌸 Patient</button>
+      <button class="pill" onclick="togglePill(this)">⚡ Impulsive</button>
+    </div>
+
+    <div class="edit-modal-section">Rules Checklist ✅</div>
+    <div class="rule-grid" id="e-rule-grid"></div>
+
+    <div class="edit-modal-section">Grade This Trade 🎀</div>
+    <div class="grade-row" id="e-grade-row">
+      <button class="grade-btn" onclick="pickEditGrade(this,'A')">A<span class="grade-sub">Perfect</span></button>
+      <button class="grade-btn" onclick="pickEditGrade(this,'B')">B<span class="grade-sub">Good</span></button>
+      <button class="grade-btn" onclick="pickEditGrade(this,'C')">C<span class="grade-sub">Okay</span></button>
+      <button class="grade-btn" onclick="pickEditGrade(this,'D')">D<span class="grade-sub">Poor</span></button>
+      <button class="grade-btn" onclick="pickEditGrade(this,'F')">F<span class="grade-sub">Broke Rules</span></button>
+    </div>
+
+    <div class="edit-modal-section">Reflection 📓</div>
+    <div class="form-grid-2" style="margin-bottom:12px;">
+      <div class="field"><label>What happened?</label><textarea id="e-what"></textarea></div>
+      <div class="field"><label>What did you learn?</label><textarea id="e-lesson"></textarea></div>
+    </div>
+    <div class="field" style="margin-bottom:4px;"><label>What would you do differently?</label><textarea id="e-diff"></textarea></div>
+
+    <div class="edit-footer">
+      <button class="edit-cancel-btn" onclick="closeEditModal()">Cancel</button>
+      <button class="edit-save-btn" onclick="saveEditTrade()">💾 Save Changes</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
