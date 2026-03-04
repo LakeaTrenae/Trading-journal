@@ -1,4 +1,4 @@
-# KE Trading Journal
+# Trading Journal
 
 A personal options trading journal to help track trades, reflect on performance, and build better habits over time.
 
