@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trade Journal</title>
+<title>Pink Trading Journal</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=Nunito:wght@300;400;500;600;700&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -99,6 +99,14 @@
         <div class="field"><label>Strike Price ($)</label><input type="number" id="f-strike" placeholder="e.g. 580"></div>
         <div class="field"><label>Expiration Date</label><input type="date" id="f-expiry"></div>
         <div class="field"><label>Contracts</label><input type="number" id="f-contracts" value="1" min="1"></div>
+      </div>
+      <div class="form-grid-3">
+        <div class="field" style="grid-column:1/-1;"><label>Paper Trade?</label>
+          <select id="f-paper">
+            <option value="no">No — Real Money</option>
+            <option value="yes">Yes — Paper</option>
+          </select>
+        </div>
       </div>
       <div class="form-grid-3">
         <div class="field"><label>Entry Price (premium $)</label><input type="number" id="f-entry" placeholder="e.g. 1.50" step="0.01"></div>
@@ -256,7 +264,7 @@
   <div class="edit-modal-box">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
       <div class="edit-modal-title">Edit Trade ✏️</div>
-      <button onclick="closeEditModal()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--text3);padding:4px 8px;border-radius:8px;">✕</button>
+      <button onclick="closeEditModal()" class="modal-close-x">✕</button>
     </div>
 
     <div class="edit-modal-section">Trade Details</div>
@@ -274,6 +282,14 @@
       <div class="field"><label>Strike ($)</label><input type="number" id="e-strike"></div>
       <div class="field"><label>Expiry</label><input type="date" id="e-expiry"></div>
       <div class="field"><label>Contracts</label><input type="number" id="e-contracts" min="1"></div>
+    </div>
+    <div class="form-grid-3" style="margin-bottom:12px;">
+      <div class="field" style="grid-column:1/-1;"><label>Paper Trade?</label>
+        <select id="e-paper">
+          <option value="no">No — Real Money</option>
+          <option value="yes">Yes — Paper</option>
+        </select>
+      </div>
     </div>
     <div class="form-grid-3" style="margin-bottom:12px;">
       <div class="field"><label>Entry Price ($)</label><input type="number" id="e-entry" step="0.01" oninput="calcEditPnl()"></div>
@@ -346,11 +362,11 @@
   <div class="modal-box" style="max-width:720px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
       <div class="modal-title" id="day-modal-title">Trades</div>
-      <button onclick="closeDayModal()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--text3);padding:4px 8px;border-radius:4px;">✕</button>
+      <button onclick="closeDayModal()" class="modal-close-x">✕</button>
     </div>
     <div id="day-modal-list" style="max-height:60vh;overflow:auto;"></div>
     <div style="display:flex;justify-content:flex-end;margin-top:14px;">
-      <button onclick="closeDayModal()" style="background:none;border:1.5px solid var(--border);color:var(--text3);font-family:var(--mono);font-size:0.5rem;letter-spacing:1.5px;text-transform:uppercase;padding:9px 14px;border-radius:6px;cursor:pointer;">Close</button>
+      <button onclick="closeDayModal()" class="modal-close-btn">Close</button>
     </div>
   </div>
 </div>

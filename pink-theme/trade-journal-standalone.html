@@ -228,6 +228,7 @@
   .ttag-rule    { background:var(--petal);  color:var(--pink3); }
   .ttag-emotion { background:#fff5f0;        color:var(--nude3); }
   .ttag-grade   { background:var(--bg3);     color:var(--text2); }
+  .ttag-paper   { background:var(--win-bg);  color:var(--win); }
   .ttag-grade.A { background:var(--win-bg);  color:var(--win); }
   .ttag-grade.B { background:var(--petal);   color:var(--pink2); }
   .tc-notes { border-top:1.5px solid var(--border); padding-top:12px; font-size:0.78rem; color:var(--text2); line-height:1.7; }
@@ -567,6 +568,14 @@
         <div class="field"><label>Contracts</label><input type="number" id="f-contracts" value="1" min="1"></div>
       </div>
       <div class="form-grid-3">
+        <div class="field" style="grid-column:1/-1;"><label>Paper Trade?</label>
+          <select id="f-paper">
+            <option value="no">No — Real Money</option>
+            <option value="yes">Yes — Paper</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid-3">
         <div class="field"><label>Entry Price (premium $)</label><input type="number" id="f-entry" placeholder="e.g. 1.50" step="0.01"></div>
         <div class="field"><label>Exit Price (premium $)</label><input type="number" id="f-exit" placeholder="e.g. 2.10" step="0.01"></div>
         <div class="field"><label>P&L (auto-calculated)</label><input type="text" id="f-pnl-calc" readonly placeholder="Fill entry & exit..."></div>
@@ -719,7 +728,7 @@
   <div class="edit-modal-box">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
       <div class="edit-modal-title">Edit Trade ✏️</div>
-      <button onclick="closeEditModal()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--text3);padding:4px 8px;border-radius:8px;">✕</button>
+      <button onclick="closeEditModal()" class="modal-close-x">✕</button>
     </div>
 
     <div class="edit-modal-section">Trade Details</div>
@@ -737,6 +746,14 @@
       <div class="field"><label>Strike ($)</label><input type="number" id="e-strike"></div>
       <div class="field"><label>Expiry</label><input type="date" id="e-expiry"></div>
       <div class="field"><label>Contracts</label><input type="number" id="e-contracts" min="1"></div>
+    </div>
+    <div class="form-grid-3" style="margin-bottom:12px;">
+      <div class="field" style="grid-column:1/-1;"><label>Paper Trade?</label>
+        <select id="e-paper">
+          <option value="no">No — Real Money</option>
+          <option value="yes">Yes — Paper</option>
+        </select>
+      </div>
     </div>
     <div class="form-grid-3" style="margin-bottom:12px;">
       <div class="field"><label>Entry Price ($)</label><input type="number" id="e-entry" step="0.01" oninput="calcEditPnl()"></div>
@@ -809,11 +826,11 @@
   <div class="modal-box" style="max-width:720px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
       <div class="modal-title" id="day-modal-title">Trades</div>
-      <button onclick="closeDayModal()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--text3);padding:4px 8px;border-radius:4px;">✕</button>
+      <button onclick="closeDayModal()" class="modal-close-x">✕</button>
     </div>
     <div id="day-modal-list" style="max-height:60vh;overflow:auto;"></div>
     <div style="display:flex;justify-content:flex-end;margin-top:14px;">
-      <button onclick="closeDayModal()" style="background:none;border:1.5px solid var(--border);color:var(--text3);font-family:var(--mono);font-size:0.5rem;letter-spacing:1.5px;text-transform:uppercase;padding:9px 14px;border-radius:6px;cursor:pointer;">Close</button>
+      <button onclick="closeDayModal()" class="modal-close-btn">Close</button>
     </div>
   </div>
 </div>
@@ -871,7 +888,8 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
     const pnl=(exit-entry)*100*contracts;
     const emotions=[...document.querySelectorAll('#emotion-grid .pill.on')].map(b=>b.textContent.trim());
     const rules=[...document.querySelectorAll('.rule-item.on')].map(r=>r.dataset.rule);
-    trades.unshift({id:Date.now(),date,ticker:tick,direction:dir,strike:document.getElementById('f-strike').value,expiry:document.getElementById('f-expiry').value,contracts,entry,exit,pnl,entryTime:document.getElementById('f-entry-time').value,exitTime:document.getElementById('f-exit-time').value,setup:[...document.querySelectorAll('#setup-grid .setup-pill.on')].map(b=>b.textContent.trim()),emotions,rules,grade,what:document.getElementById('f-what').value,lesson:document.getElementById('f-lesson').value,diff:document.getElementById('f-diff').value});
+    const paperTrade = document.getElementById('f-paper')?.value === 'yes';
+    trades.unshift({id:Date.now(),date,ticker:tick,direction:dir,strike:document.getElementById('f-strike').value,expiry:document.getElementById('f-expiry').value,contracts,entry,exit,pnl,paperTrade,entryTime:document.getElementById('f-entry-time').value,exitTime:document.getElementById('f-exit-time').value,setup:[...document.querySelectorAll('#setup-grid .setup-pill.on')].map(b=>b.textContent.trim()),emotions,rules,grade,what:document.getElementById('f-what').value,lesson:document.getElementById('f-lesson').value,diff:document.getElementById('f-diff').value});
     localStorage.setItem('tj_pink',JSON.stringify(trades));
     updateHeader();
   renderCalendar(); resetForm(); alert('✓ Trade saved! Keep going 🌸');
@@ -881,6 +899,7 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
     ['f-ticker','f-strike','f-entry','f-exit','f-pnl-calc','f-what','f-lesson','f-diff'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('f-pnl-calc').style.color='';
     ['f-direction','f-expiry','f-entry-time','f-exit-time'].forEach(id=>document.getElementById(id).value='');
+    if(document.getElementById('f-paper')) document.getElementById('f-paper').value='no';
     document.querySelectorAll('#setup-grid .setup-pill.on').forEach(b=>b.classList.remove('on'));
     document.getElementById('f-contracts').value='1';
     document.getElementById('f-date').valueAsDate=new Date();
@@ -949,6 +968,7 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
       const pc=t.pnl>0?'w':t.pnl<0?'l':'b';
       const ps=(t.pnl>=0?'+':'')+'$'+t.pnl.toFixed(2);
       const cc=t.pnl>0?'is-win':t.pnl<0?'is-loss':'';
+      const paperTag = t.paperTrade ? '<span class="ttag ttag-paper">Paper</span>' : '';
       return `<div class="trade-card ${cc}" style="margin-bottom:10px;">
         <div class="tc-top">
           <div style="display:flex;align-items:center;gap:8px;"><span class="tc-ticker">${t.ticker}</span><span class="tc-dir ${t.direction==='CALL'?'call':'put'}">${t.direction}</span></div>
@@ -962,6 +982,7 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
           <div class="tc-meta-item"><div class="tc-meta-lbl">Qty</div><div class="tc-meta-val">${t.contracts}x</div></div>
           ${t.grade?`<div class="tc-meta-item"><div class="tc-meta-lbl">Grade</div><div class="tc-meta-val">${t.grade}</div></div>`:''}
         </div>
+        ${paperTag?`<div class="tc-tags">${paperTag}</div>`:''}
         ${t.what?`<div class="tc-notes"><strong>What happened:</strong> ${t.what}</div>`:''}
       </div>`;
     }).join('');
@@ -1040,6 +1061,7 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
       const cc=t.pnl>0?'is-win':t.pnl<0?'is-loss':'';
       const eTags=(t.emotions||[]).map(e=>`<span class="ttag ttag-emotion">${e}</span>`).join('');
       const rTags=(t.rules||[]).slice(0,3).map(r=>`<span class="ttag ttag-rule">${r.substring(0,26)}</span>`).join('');
+      const pTag=t.paperTrade?`<span class="ttag ttag-paper">Paper</span>`:'';
       const gc=t.grade==='A'?'A':t.grade==='B'?'B':'';
       const gTag=t.grade?`<span class="ttag ttag-grade ${gc}">Grade ${t.grade}</span>`:'';
       return `<div class="trade-card ${cc}">
@@ -1058,7 +1080,7 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
           <div class="tc-meta-item"><div class="tc-meta-lbl">Exit</div><div class="tc-meta-val">$${t.exit.toFixed(2)}</div></div>
           ${t.setup&&(Array.isArray(t.setup)?t.setup.length:t.setup)?`<div class="tc-meta-item"><div class="tc-meta-lbl">Setup</div><div class="tc-meta-val">${Array.isArray(t.setup)?t.setup.join(', '):t.setup}</div></div>`:''}
         </div>
-        ${gTag||rTags||eTags?`<div class="tc-tags">${gTag}${rTags}${eTags}</div>`:''}
+        ${gTag||rTags||eTags||pTag?`<div class="tc-tags">${gTag}${pTag}${rTags}${eTags}</div>`:''}
         ${t.what||t.lesson||t.diff?`<div class="tc-notes">${t.what?`<strong>What happened:</strong> ${t.what}<br>`:''} ${t.lesson?`<strong>Lesson:</strong> ${t.lesson}<br>`:''} ${t.diff?`<strong>Next time:</strong> ${t.diff}`:''}</div>`:''}
       </div>`;
     }).join('');
@@ -1256,6 +1278,7 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
     document.getElementById('e-strike').value = t.strike||'';
     document.getElementById('e-expiry').value = t.expiry||'';
     document.getElementById('e-contracts').value = t.contracts||1;
+    if(document.getElementById('e-paper')) document.getElementById('e-paper').value = t.paperTrade ? 'yes' : 'no';
     document.getElementById('e-entry').value = t.entry||'';
     document.getElementById('e-exit').value = t.exit||'';
     document.getElementById('e-entry-time').value = t.entryTime||'';
@@ -1323,10 +1346,11 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
     const rules = [...document.querySelectorAll('#e-rule-grid .rule-item.on')].map(r=>r.dataset.rule);
     const idx = trades.findIndex(x=>x.id===editingId);
     if(idx===-1) return;
+    const paperTrade = document.getElementById('e-paper')?.value === 'yes';
     trades[idx] = {...trades[idx], date, ticker:tick, direction:dir,
       strike:document.getElementById('e-strike').value,
       expiry:document.getElementById('e-expiry').value,
-      contracts, entry, exit, pnl,
+      contracts, entry, exit, pnl, paperTrade,
       entryTime:document.getElementById('e-entry-time').value,
       exitTime:document.getElementById('e-exit-time').value,
       setup, emotions, rules, grade:editGrade,
