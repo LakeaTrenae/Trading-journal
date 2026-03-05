@@ -50,7 +50,8 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
     const pnl=(exit-entry)*100*contracts;
     const emotions=[...document.querySelectorAll('#emotion-grid .pill.on')].map(b=>b.textContent.trim());
     const rules=[...document.querySelectorAll('.rule-item.on')].map(r=>r.dataset.rule);
-    trades.unshift({id:Date.now(),date,ticker:tick,direction:dir,strike:document.getElementById('f-strike').value,expiry:document.getElementById('f-expiry').value,contracts,entry,exit,pnl,entryTime:document.getElementById('f-entry-time').value,exitTime:document.getElementById('f-exit-time').value,setup:[...document.querySelectorAll('#setup-grid .setup-pill.on')].map(b=>b.textContent.trim()),emotions,rules,grade,what:document.getElementById('f-what').value,lesson:document.getElementById('f-lesson').value,diff:document.getElementById('f-diff').value});
+    const paperTrade = document.getElementById('f-paper')?.value === 'yes';
+    trades.unshift({id:Date.now(),date,ticker:tick,direction:dir,strike:document.getElementById('f-strike').value,expiry:document.getElementById('f-expiry').value,contracts,entry,exit,pnl,paperTrade,entryTime:document.getElementById('f-entry-time').value,exitTime:document.getElementById('f-exit-time').value,setup:[...document.querySelectorAll('#setup-grid .setup-pill.on')].map(b=>b.textContent.trim()),emotions,rules,grade,what:document.getElementById('f-what').value,lesson:document.getElementById('f-lesson').value,diff:document.getElementById('f-diff').value});
     localStorage.setItem('tj_pink',JSON.stringify(trades));
     updateHeader();
   renderCalendar(); resetForm(); alert('✓ Trade saved! Keep going 🌸');
@@ -60,6 +61,7 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
     ['f-ticker','f-strike','f-entry','f-exit','f-pnl-calc','f-what','f-lesson','f-diff'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('f-pnl-calc').style.color='';
     ['f-direction','f-expiry','f-entry-time','f-exit-time'].forEach(id=>document.getElementById(id).value='');
+    if(document.getElementById('f-paper')) document.getElementById('f-paper').value='no';
     document.querySelectorAll('#setup-grid .setup-pill.on').forEach(b=>b.classList.remove('on'));
     document.getElementById('f-contracts').value='1';
     document.getElementById('f-date').valueAsDate=new Date();
@@ -69,7 +71,6 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
     grade='';
   }
 
-// ── BUILD DAY MAP ──
   function buildDayMap(){
     const map={};
     trades.forEach(t=>{
@@ -80,7 +81,6 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
     return map;
   }
 
-  // ── CALENDAR ──
   function changeMonth(dir){
     calMonth+=dir;
     if(calMonth>11){calMonth=0;calYear++;}
@@ -100,7 +100,6 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
     let html='';
 
     for(let d=1;d<=daysInMonth;d++){
-      // on first day, use grid-column-start to offset correctly
       let gridStyle = d===1 && firstDay>0 ? ` style="grid-column-start:${firstDay+1}"` : '';
       const dateStr=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
       const isToday=today.getFullYear()===calYear&&today.getMonth()===calMonth&&today.getDate()===d;
@@ -116,23 +115,64 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
         inner+=`<div class="cal-day-pnl">${(p>=0?'+':'')+'$'+Math.abs(p).toFixed(0)}</div>`;
         inner+=`<div class="cal-day-trades">${data.count} trade${data.count!==1?'s':''}</div>`;
       }
-      html+=`<div class="${cls}"${gridStyle}>${inner}</div>`;gridStyle='';
+      html+=`<div class="${cls}"${gridStyle} onclick="openDayModal('${dateStr}')">${inner}</div>`;gridStyle='';
     }
     document.getElementById('cal-grid').innerHTML=html;
     renderWeekly();
   }
 
-  // ── WEEKLY SUMMARY ──
+  function openDayModal(dateStr){
+    const dayTrades = trades.filter(t => t.date === dateStr);
+    const [year, month, day] = dateStr.split('-');
+    document.getElementById('day-modal-title').textContent = `${MONTHS[parseInt(month)-1]} ${parseInt(day)}, ${year}`;
+    document.getElementById('day-modal-list').innerHTML = dayTrades.length ? dayTrades.map(t => {
+      const pc=t.pnl>0?'w':t.pnl<0?'l':'b';
+      const ps=(t.pnl>=0?'+':'')+'$'+t.pnl.toFixed(2);
+      const cc=t.pnl>0?'is-win':t.pnl<0?'is-loss':'';
+      const paperTag = t.paperTrade ? '<span class="ttag ttag-paper">Paper</span>' : '';
+      return `<div class="trade-card ${cc}" style="margin-bottom:10px;">
+        <div class="tc-top">
+          <div style="display:flex;align-items:center;gap:8px;"><span class="tc-ticker">${t.ticker}</span><span class="tc-dir ${t.direction==='CALL'?'call':'put'}">${t.direction}</span></div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span class="tc-pnl ${pc}">${ps}</span>
+            <button class="edit-btn" onclick="openEditModal(${t.id})" title="Edit">✎</button>
+          </div>
+        </div>
+        <div class="tc-meta">
+          ${t.entryTime?`<div class="tc-meta-item"><div class="tc-meta-lbl">In</div><div class="tc-meta-val">${t.entryTime}</div></div>`:''}
+          ${t.exitTime?`<div class="tc-meta-item"><div class="tc-meta-lbl">Out</div><div class="tc-meta-val">${t.exitTime}</div></div>`:''}
+          <div class="tc-meta-item"><div class="tc-meta-lbl">Entry</div><div class="tc-meta-val">$${t.entry.toFixed(2)}</div></div>
+          <div class="tc-meta-item"><div class="tc-meta-lbl">Exit</div><div class="tc-meta-val">$${t.exit.toFixed(2)}</div></div>
+          <div class="tc-meta-item"><div class="tc-meta-lbl">Qty</div><div class="tc-meta-val">${t.contracts}x</div></div>
+          ${t.grade?`<div class="tc-meta-item"><div class="tc-meta-lbl">Grade</div><div class="tc-meta-val">${t.grade}</div></div>`:''}
+        </div>
+        ${paperTag?`<div class="tc-tags">${paperTag}</div>`:''}
+        ${t.what?`<div class="tc-notes"><strong>What happened:</strong> ${t.what}</div>`:''}
+      </div>`;
+    }).join('') : '<div class="empty" style="padding:24px 0;"><div class="empty-icon">🌸</div><div class="empty-title">No trades for this day</div><div class="empty-sub">Log a trade to see it here</div></div>';
+    const modal = document.getElementById('day-modal');
+    modal.style.display = 'flex';
+    modal.style.alignItems = 'center';
+    modal.style.justifyContent = 'center';
+    modal.style.padding = '16px';
+  }
+
+  function closeDayModal(){
+    document.getElementById('day-modal').style.display = 'none';
+  }
+
+  document.getElementById('day-modal').addEventListener('click', function(e){
+    if(e.target === this) closeDayModal();
+  });
+
   function renderWeekly(){
     const dayMap=buildDayMap();
-    // get all weeks in current month
     const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
     const weeks=[];
     let week=[];
     for(let d=1;d<=daysInMonth;d++){
       const dateObj=new Date(calYear,calMonth,d);
       const dow=dateObj.getDay();
-      // Monday start for trading weeks
       if(dow===1&&week.length>0){weeks.push(week);week=[];}
       week.push({d,dateObj,dateStr:`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`});
     }
@@ -143,7 +183,6 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
     const html=weeks.map(wk=>{
       let weekPnl=0, winDays=0, lossDays=0, tradeDays=0;
       const dots=[];
-      // Mon–Fri only
       const tradingDays=wk.filter(day=>day.dateObj.getDay()>=1&&day.dateObj.getDay()<=5);
       tradingDays.forEach(day=>{
         const data=dayMap[day.dateStr];
@@ -176,7 +215,6 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
     document.getElementById('week-cards').innerHTML=html||`<div class="empty" style="padding:30px 0;"><div class="empty-sub">Log trades to see weekly breakdown</div></div>`;
   }
 
-  
   function renderHistory(){
     const list=document.getElementById('trade-list');
     document.getElementById('log-count').textContent=trades.length+' trade'+(trades.length!==1?'s':'')+' logged';
@@ -187,6 +225,7 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
       const cc=t.pnl>0?'is-win':t.pnl<0?'is-loss':'';
       const eTags=(t.emotions||[]).map(e=>`<span class="ttag ttag-emotion">${e}</span>`).join('');
       const rTags=(t.rules||[]).slice(0,3).map(r=>`<span class="ttag ttag-rule">${r.substring(0,26)}</span>`).join('');
+      const pTag=t.paperTrade?`<span class="ttag ttag-paper">Paper</span>`:'';
       const gc=t.grade==='A'?'A':t.grade==='B'?'B':'';
       const gTag=t.grade?`<span class="ttag ttag-grade ${gc}">Grade ${t.grade}</span>`:'';
       return `<div class="trade-card ${cc}">
@@ -205,7 +244,7 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
           <div class="tc-meta-item"><div class="tc-meta-lbl">Exit</div><div class="tc-meta-val">$${t.exit.toFixed(2)}</div></div>
           ${t.setup&&(Array.isArray(t.setup)?t.setup.length:t.setup)?`<div class="tc-meta-item"><div class="tc-meta-lbl">Setup</div><div class="tc-meta-val">${Array.isArray(t.setup)?t.setup.join(', '):t.setup}</div></div>`:''}
         </div>
-        ${gTag||rTags||eTags?`<div class="tc-tags">${gTag}${rTags}${eTags}</div>`:''}
+        ${gTag||rTags||eTags||pTag?`<div class="tc-tags">${gTag}${pTag}${rTags}${eTags}</div>`:''}
         ${t.what||t.lesson||t.diff?`<div class="tc-notes">${t.what?`<strong>What happened:</strong> ${t.what}<br>`:''} ${t.lesson?`<strong>Lesson:</strong> ${t.lesson}<br>`:''} ${t.diff?`<strong>Next time:</strong> ${t.diff}`:''}</div>`:''}
       </div>`;
     }).join('');
@@ -246,7 +285,6 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
     const date=new Date().toISOString().slice(0,10);
     const filename='my-trades-backup-'+date+'.json';
     const blob=new Blob([data],{type:'application/json'});
-    // iOS Safari — opens native share sheet (Files, AirDrop, iCloud Drive, etc.)
     if(navigator.share && navigator.canShare){
       const file=new File([blob],filename,{type:'application/json'});
       if(navigator.canShare({files:[file]})){
@@ -307,7 +345,7 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
     document.getElementById('h-pnl').textContent=(pnl>=0?'+':'')+'$'+pnl.toFixed(2);
     document.getElementById('h-pnl').className='hstat-value '+(pnl>=0?'win':'loss');
   }
-  // ── EDITABLE RULES ──
+
   const DEFAULT_RULES = [
     { label: "Waited for 15-min opening range to form",     key: "Waited for 15-min ORB to form" },
     { label: "Candle closed beyond level — not just a wick", key: "Candle closed beyond level (Break & Hold)" },
@@ -326,10 +364,12 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
 
   function renderRuleGrid(){
     const grid = document.getElementById('rule-grid-dynamic');
+    if(!grid) return;
     grid.innerHTML = customRules.map(r=>`
       <div class="rule-item" onclick="toggleRule(this)" data-rule="${r.key}">
         <div class="chk"></div>${r.label}
       </div>`).join('');
+    buildEditRuleGrid();
   }
 
   function openRulesModal(){
@@ -375,13 +415,11 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
     closeRulesModal();
   }
 
-  // Close modal on overlay click
   document.getElementById('rules-modal').addEventListener('click', function(e){
     if(e.target === this) closeRulesModal();
   });
 
-
-  // ── EDIT TRADE ──
+  // EDIT TRADE
   let editingId = null;
   let editGrade = '';
 
@@ -406,6 +444,7 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
     document.getElementById('e-strike').value = t.strike||'';
     document.getElementById('e-expiry').value = t.expiry||'';
     document.getElementById('e-contracts').value = t.contracts||1;
+    if(document.getElementById('e-paper')) document.getElementById('e-paper').value = t.paperTrade ? 'yes' : 'no';
     document.getElementById('e-entry').value = t.entry||'';
     document.getElementById('e-exit').value = t.exit||'';
     document.getElementById('e-entry-time').value = t.entryTime||'';
@@ -415,18 +454,15 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
     document.getElementById('e-diff').value = t.diff||'';
     calcEditPnl();
 
-    // setup pills
     const setups = Array.isArray(t.setup) ? t.setup : (t.setup ? [t.setup] : []);
     document.querySelectorAll('#e-setup-grid .setup-pill').forEach(b=>{
       b.classList.toggle('on', setups.includes(b.textContent.trim()));
     });
 
-    // emotions
     document.querySelectorAll('#e-emotion-grid .pill').forEach(b=>{
       b.classList.toggle('on', (t.emotions||[]).includes(b.textContent.trim()));
     });
 
-    // rules
     buildEditRuleGrid();
     document.querySelectorAll('#e-rule-grid .rule-item').forEach(r=>{
       const on = (t.rules||[]).includes(r.dataset.rule);
@@ -434,7 +470,6 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
       r.querySelector('.chk').textContent = on ? '✓' : '';
     });
 
-    // grade
     document.querySelectorAll('#e-grade-row .grade-btn').forEach(b=>b.className='grade-btn');
     if(t.grade){
       const gb = document.querySelector(`#e-grade-row .grade-btn[onclick*="'${t.grade}'"]`);
@@ -477,10 +512,11 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
     const rules = [...document.querySelectorAll('#e-rule-grid .rule-item.on')].map(r=>r.dataset.rule);
     const idx = trades.findIndex(x=>x.id===editingId);
     if(idx===-1) return;
+    const paperTrade = document.getElementById('e-paper')?.value === 'yes';
     trades[idx] = {...trades[idx], date, ticker:tick, direction:dir,
       strike:document.getElementById('e-strike').value,
       expiry:document.getElementById('e-expiry').value,
-      contracts, entry, exit, pnl,
+      contracts, entry, exit, pnl, paperTrade,
       entryTime:document.getElementById('e-entry-time').value,
       exitTime:document.getElementById('e-exit-time').value,
       setup, emotions, rules, grade:editGrade,
@@ -506,3 +542,4 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
 
   renderRuleGrid();
   updateHeader();
+  renderCalendar();
