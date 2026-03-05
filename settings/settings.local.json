@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh repo view LakeaTrenae/ke-trading-journal --json refs)",
+      "Bash(gh api repos/LakeaTrenae/ke-trading-journal/branches)"
+    ]
+  }
+}
