@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trade Journal</title>
+<title>Pink Trading Journal</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=Nunito:wght@300;400;500;600;700&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -109,17 +109,29 @@
   .pill { background:var(--bg3); border:1.5px solid var(--border); border-radius:30px; color:var(--text2); font-family:var(--body); font-size:0.72rem; font-weight:600; padding:7px 16px; cursor:pointer; transition:all 0.18s; white-space:nowrap; }
   .pill:hover { border-color:var(--pink1); color:var(--pink2); background:var(--petal); }
 
-  /* SETUP PILLS */
+  /* ── SETUP PILLS ── */
   .setup-pill-grid { display:flex; gap:8px; flex-wrap:wrap; }
   .setup-pill { background:var(--bg3); border:1.5px solid var(--border); border-radius:30px; color:var(--text2); font-family:var(--body); font-size:0.72rem; font-weight:600; padding:7px 16px; cursor:pointer; transition:all 0.18s; white-space:nowrap; }
   .setup-pill:hover { border-color:var(--pink1); color:var(--pink2); background:var(--petal); }
   .setup-pill.on { background:linear-gradient(135deg,var(--blush),var(--petal)); border-color:var(--pink1); color:var(--pink3); box-shadow:0 2px 8px var(--shadow); }
 
-  /* EDIT TRADE MODAL */
+  /* ── EDIT TRADE MODAL ── */
   .edit-modal-overlay { display:none; position:fixed; inset:0; background:rgba(58,32,48,0.45); z-index:600; align-items:flex-start; justify-content:center; padding:16px; overflow-y:auto; }
   .edit-modal-overlay.open { display:flex; }
   .edit-modal-box { background:var(--bg2); border:1.5px solid var(--border); border-radius:20px; padding:28px; width:100%; max-width:640px; margin:auto; box-shadow:0 20px 60px rgba(240,160,180,0.3); }
   .edit-modal-title { font-family:var(--heading); font-size:1.4rem; font-style:italic; color:var(--text); }
+  .modal-close-x {
+    background:var(--petal);
+    border:1.5px solid var(--pink1);
+    color:var(--pink3);
+    font-size:1.2rem;
+    cursor:pointer;
+    padding:6px 10px;
+    border-radius:10px;
+    box-shadow:0 3px 10px var(--shadow);
+    transition:all 0.15s;
+  }
+  .modal-close-x:hover { background:var(--pink2); border-color:var(--pink2); color:white; transform:translateY(-1px); }
   .edit-modal-section { font-size:0.62rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--pink2); margin:18px 0 10px; padding-bottom:8px; border-bottom:1.5px solid var(--border); }
   .edit-footer { display:flex; gap:10px; justify-content:flex-end; margin-top:20px; }
   .edit-cancel-btn { background:var(--bg3); border:1.5px solid var(--border); color:var(--text2); border-radius:10px; font-family:var(--body); font-size:0.68rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; padding:11px 18px; cursor:pointer; transition:all 0.15s; }
@@ -168,7 +180,7 @@
   .import-label { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; }
   .import-label:hover { border-color:var(--pink1); color:var(--pink2); background:var(--petal); }
 
-  /* BACKUP BANNER */
+  /* ── BACKUP BANNER ── */
   .backup-banner {
     background: var(--petal);
     border: 1.5px solid var(--blush);
@@ -270,7 +282,9 @@
   .deco-dots { position:fixed; top:80px; right:20px; width:120px; height:120px; background-image:radial-gradient(var(--blush) 1.5px,transparent 1.5px); background-size:14px 14px; opacity:0.6; pointer-events:none; border-radius:50%; }
   .deco-circle { position:fixed; bottom:40px; left:-40px; width:200px; height:200px; border-radius:50%; border:20px solid var(--petal); opacity:0.5; pointer-events:none; }
 
-  /* CALENDAR */
+/* ══════════════════════════════════════════
+     CALENDAR
+  ══════════════════════════════════════════ */
   .cal-nav { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
   .cal-month { font-family:var(--heading); font-size:1.8rem; letter-spacing:4px; color:var(--text); }
   .cal-year { font-family:var(--mono); font-size:0.75rem; color:var(--text3); margin-left:8px; }
@@ -311,7 +325,7 @@
   .cal-day.win-day  .cal-day-trades { color:var(--pink1); }
   .cal-day.loss-day .cal-day-trades { color:#e89888; }
 
-  /* WEEKLY SUMMARY */
+  /* ── WEEKLY SUMMARY ── */
   .weekly-section { margin-top:24px; }
   .weekly-title { font-family:var(--heading); font-size:1rem; letter-spacing:3px; color:var(--text2); margin-bottom:12px; padding-bottom:10px; border-bottom:1.5px solid var(--border); }
 
@@ -349,7 +363,7 @@
   .week-dot.l { background:var(--loss-bright); }
   .week-dot.n { background:var(--border2); }
 
-  /* CAL LEGEND */
+  /* ── CAL LEGEND ── */
   .cal-legend { display:flex; gap:16px; margin-bottom:18px; flex-wrap:wrap; }
   .leg-item { display:flex; align-items:center; gap:6px; font-family:var(--body); font-size:0.65rem; font-weight:600; color:var(--text2); }
   .leg-dot { width:14px; height:14px; border-radius:4px; flex-shrink:0; }
@@ -357,7 +371,9 @@
   .leg-dot.l { background:var(--loss-bg); border:1.5px solid var(--loss); }
   .leg-dot.n { background:var(--bg2); border:1.5px solid var(--border); }
 
-  /* BOTTOM NAV (mobile) */
+  
+  
+  /* ── BOTTOM NAV (mobile) ── */
   .bottom-nav { display:none; position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1.5px solid var(--border); z-index:200; box-shadow:0 -4px 20px var(--shadow2); }
   .bottom-nav-inner { display:flex; }
   .bnav-btn { flex:1; background:none; border:none; color:var(--text3); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; padding:10px 4px 12px; cursor:pointer; transition:all 0.15s; font-family:var(--body); font-size:0.5rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; }
@@ -365,10 +381,29 @@
   .bnav-btn.active { color:var(--pink2); }
   .bnav-btn:active { background:var(--petal); }
 
-  /* EDITABLE RULES MODAL */
+
+  /* ══════════════════════════════════════════
+     EDITABLE RULES MODAL
+  ══════════════════════════════════════════ */
   .modal-overlay { display:none; position:fixed; inset:0; background:rgba(58,32,48,0.45); z-index:500; align-items:center; justify-content:center; padding:16px; }
   .modal-overlay.open { display:flex; }
   .modal { background:var(--bg2); border:1.5px solid var(--border); border-radius:20px; padding:28px; width:100%; max-width:560px; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(240,160,180,0.3); }
+  .modal-close-btn {
+    background:var(--petal);
+    border:1.5px solid var(--pink1);
+    color:var(--pink3);
+    font-family:var(--body);
+    font-size:0.66rem;
+    font-weight:800;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    padding:10px 16px;
+    border-radius:8px;
+    cursor:pointer;
+    box-shadow:0 3px 10px var(--shadow);
+    transition:all 0.15s;
+  }
+  .modal-close-btn:hover { background:var(--pink2); border-color:var(--pink2); color:white; transform:translateY(-1px); }
   .modal-title { font-family:var(--heading); font-size:1.4rem; font-style:italic; color:var(--text); margin-bottom:4px; }
   .modal-sub { font-size:0.68rem; color:var(--text3); margin-bottom:20px; font-weight:500; }
   .rule-edit-list { display:flex; flex-direction:column; gap:8px; margin-bottom:18px; }
@@ -389,10 +424,9 @@
   .block-label-row { display:flex; align-items:center; width:100%; gap:10px; margin-bottom:14px; }
   .block-label-row .block-label { margin-bottom:0; flex:1; }
 
-  /* DAY MODAL */
-  .modal-box { background:var(--bg2); border:1.5px solid var(--border); border-radius:20px; padding:28px; width:100%; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(240,160,180,0.3); }
-
-  /* RESPONSIVE — TABLET */
+  /* ══════════════════════════════════════════
+     RESPONSIVE — TABLET (≤900px)
+  ══════════════════════════════════════════ */
   @media (max-width: 900px) {
     main { max-width: 100%; padding: 24px 20px 80px; }
     .stats-top { grid-template-columns: 1fr 1fr; }
@@ -400,37 +434,66 @@
     .week-stats { gap: 14px; }
   }
 
-  /* RESPONSIVE — MOBILE */
+  /* ══════════════════════════════════════════
+     RESPONSIVE — MOBILE (≤700px)
+  ══════════════════════════════════════════ */
   @media (max-width: 700px) {
+
+    /* ── HEADER ── */
     header { padding: 0 16px; height: 56px; }
     .logo-text { font-size: 1.5rem; }
     .logo-sub { display: none; }
     .header-stats { display: none; }
     .deco-dots, .deco-circle { display: none; }
+
+    /* ── NAVIGATION ── */
     .tabs { display: none; }
     .bottom-nav { display: block; }
+
+    /* ── MAIN LAYOUT ── */
     main { padding: 14px 12px 88px; }
+
+    /* ── PAGE TITLES ── */
     .page-title { font-size: 1.55rem; margin-bottom: 4px; }
     .page-sub { font-size: 0.68rem; margin-bottom: 16px; }
+
+    /* ── CARDS ── */
     .card { padding: 14px; border-radius: 14px; margin-bottom: 12px; }
+
+    /* ── BLOCK LABEL ── */
     .block-label { font-size: 0.6rem; margin-bottom: 10px; }
+
+    /* ── FORM GRIDS → SINGLE COLUMN ── */
     .form-grid-3,
     .form-grid-2,
     .rule-grid,
     .stats-bottom { grid-template-columns: 1fr; gap: 10px; }
+
     .stats-top { grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    /* ── INPUTS — prevent zoom on iOS ── */
     .field input,
     .field select,
     .field textarea { font-size: 16px; padding: 12px 13px; }
     .field label { font-size: 0.6rem; }
     .field textarea { min-height: 80px; }
+
+    /* ── PILLS ── */
     .pill { font-size: 0.68rem; padding: 8px 14px; }
+
+    /* ── RULES ── */
     .rule-item { padding: 11px 14px; font-size: 0.78rem; }
     .chk { width: 20px; height: 20px; font-size: 0.7rem; }
+
+    /* ── GRADE BUTTONS ── */
     .grade-row { gap: 6px; }
     .grade-btn { font-size: 1.45rem; padding: 10px 2px 6px; }
     .grade-sub { font-size: 0.43rem; }
+
+    /* ── SAVE BUTTON ── */
     .save-btn { padding: 17px; font-size: 0.75rem; letter-spacing: 2px; margin-top: 14px; }
+
+    /* ── CALENDAR ── */
     .cal-day { height: 48px; border-radius: 8px; padding: 3px 2px; }
     .cal-day-num { font-size: 0.6rem; }
     .cal-day-pnl { font-size: 0.5rem; margin-top: 2px; }
@@ -443,28 +506,53 @@
     .cal-year { font-size: 0.68rem; }
     .cal-legend { gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
     .leg-item { font-size: 0.58rem; }
-    #panel-calendar > div:first-child { flex-direction: column; gap: 8px; margin-bottom: 6px; }
-    #panel-calendar > div:first-child .cal-nav { width: 100%; justify-content: space-between; margin-bottom: 0; }
+
+    #panel-calendar > div:first-child {
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    #panel-calendar > div:first-child .cal-nav {
+      width: 100%;
+      justify-content: space-between;
+      margin-bottom: 0;
+    }
+
+    /* ── WEEKLY CARDS ── */
     .week-card { flex-direction: column; gap: 10px; padding: 12px 14px; }
     .week-stats { justify-content: space-between; width: 100%; gap: 6px; flex-wrap: wrap; }
     .week-pnl { font-size: 1.35rem; }
+
+    /* ── TRADE HISTORY CARDS ── */
     .tc-ticker { font-size: 1.2rem; }
     .tc-pnl { font-size: 1.2rem; }
     .trade-card { padding: 14px; }
+
+    /* ── HISTORY HEADER ── */
     .history-header { flex-direction: column; gap: 10px; align-items: flex-start; }
     .btn-row { width: 100%; flex-wrap: wrap; }
     .btn-ghost { flex: 1; text-align: center; padding: 10px 6px; font-size: 0.58rem; min-width: 60px; }
+
+    /* ── STAT BOXES ── */
     .stat-box { padding: 14px; }
     .stat-val { font-size: 1.8rem; }
+
+    /* ── BACKUP BANNER ── */
     .backup-banner { flex-direction: column; align-items: flex-start; gap: 10px; padding: 12px 14px; }
     .backup-btns { width: 100%; }
     .backup-btn { flex: 1; text-align: center; padding: 11px; }
+
+    /* ── MODAL ── */
     .modal { padding: 20px; border-radius: 16px; }
     .modal-actions { flex-direction: column; }
+
+    /* ── BOTTOM NAV SAFE AREA ── */
     .bottom-nav { padding-bottom: env(safe-area-inset-bottom, 0px); }
   }
 
-  /* RESPONSIVE — SMALL PHONES */
+  /* ══════════════════════════════════════════
+     RESPONSIVE — SMALL PHONES (≤380px)
+  ══════════════════════════════════════════ */
   @media (max-width: 380px) {
     main { padding: 12px 10px 88px; }
     .logo-text { font-size: 1.3rem; }
@@ -474,6 +562,7 @@
     .stats-top { gap: 8px; }
     .stat-val { font-size: 1.5rem; }
   }
+
 </style>
 </head>
 <body>
@@ -503,7 +592,7 @@
 
 <main>
 
-<!-- CALENDAR -->
+<!-- ══════════ CALENDAR ══════════ -->
   <div class="panel active" id="panel-calendar">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:8px;">
       <div>
@@ -543,6 +632,8 @@
       </div>
     </div>
   </div>
+
+  
 
   <!-- LOG -->
   <div class="panel" id="panel-log">
@@ -665,6 +756,7 @@
         <button class="btn-ghost danger" onclick="clearAll()">🗑 Clear All</button>
       </div>
     </div>
+    <!-- backup banner -->
     <div class="backup-banner">
       <div class="backup-text">
         <strong>💾 Backup Your Trades</strong>
@@ -723,7 +815,9 @@
   </div>
 </div>
 
-<!-- EDIT TRADE MODAL -->
+
+
+<!-- ══════════ EDIT TRADE MODAL ══════════ -->
 <div class="edit-modal-overlay" id="edit-modal">
   <div class="edit-modal-box">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
@@ -821,8 +915,8 @@
   </div>
 </div>
 
-<!-- Day modal -->
-<div class="modal-overlay" id="day-modal" style="display:none;">
+<!-- Day modal: shows trades for a clicked calendar day -->
+<div class="modal-overlay" id="day-modal">
   <div class="modal-box" style="max-width:720px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
       <div class="modal-title" id="day-modal-title">Trades</div>
@@ -961,10 +1055,9 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
 
   function openDayModal(dateStr){
     const dayTrades = trades.filter(t => t.date === dateStr);
-    if(!dayTrades.length) return;
     const [year, month, day] = dateStr.split('-');
     document.getElementById('day-modal-title').textContent = `${MONTHS[parseInt(month)-1]} ${parseInt(day)}, ${year}`;
-    document.getElementById('day-modal-list').innerHTML = dayTrades.map(t => {
+    document.getElementById('day-modal-list').innerHTML = dayTrades.length ? dayTrades.map(t => {
       const pc=t.pnl>0?'w':t.pnl<0?'l':'b';
       const ps=(t.pnl>=0?'+':'')+'$'+t.pnl.toFixed(2);
       const cc=t.pnl>0?'is-win':t.pnl<0?'is-loss':'';
@@ -972,7 +1065,10 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
       return `<div class="trade-card ${cc}" style="margin-bottom:10px;">
         <div class="tc-top">
           <div style="display:flex;align-items:center;gap:8px;"><span class="tc-ticker">${t.ticker}</span><span class="tc-dir ${t.direction==='CALL'?'call':'put'}">${t.direction}</span></div>
-          <span class="tc-pnl ${pc}">${ps}</span>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span class="tc-pnl ${pc}">${ps}</span>
+            <button class="edit-btn" onclick="openEditModal(${t.id})" title="Edit">✎</button>
+          </div>
         </div>
         <div class="tc-meta">
           ${t.entryTime?`<div class="tc-meta-item"><div class="tc-meta-lbl">In</div><div class="tc-meta-val">${t.entryTime}</div></div>`:''}
@@ -985,7 +1081,7 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
         ${paperTag?`<div class="tc-tags">${paperTag}</div>`:''}
         ${t.what?`<div class="tc-notes"><strong>What happened:</strong> ${t.what}</div>`:''}
       </div>`;
-    }).join('');
+    }).join('') : '<div class="empty" style="padding:24px 0;"><div class="empty-icon">🌸</div><div class="empty-title">No trades for this day</div><div class="empty-sub">Log a trade to see it here</div></div>';
     const modal = document.getElementById('day-modal');
     modal.style.display = 'flex';
     modal.style.alignItems = 'center';
@@ -1200,10 +1296,12 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
 
   function renderRuleGrid(){
     const grid = document.getElementById('rule-grid-dynamic');
+    if(!grid) return;
     grid.innerHTML = customRules.map(r=>`
       <div class="rule-item" onclick="toggleRule(this)" data-rule="${r.key}">
         <div class="chk"></div>${r.label}
       </div>`).join('');
+    buildEditRuleGrid();
   }
 
   function openRulesModal(){
@@ -1377,6 +1475,8 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
   renderRuleGrid();
   updateHeader();
   renderCalendar();
+
 </script>
+
 </body>
 </html>
