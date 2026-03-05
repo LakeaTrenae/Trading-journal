@@ -116,7 +116,7 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
         inner+=`<div class="cal-day-pnl">${(p>=0?'+':'')+'$'+Math.abs(p).toFixed(0)}</div>`;
         inner+=`<div class="cal-day-trades">${data.count} trade${data.count!==1?'s':''}</div>`;
       }
-      html+=`<div class="${cls}"${gridStyle}>${inner}</div>`;gridStyle='';
+      html+=`<div class="${cls}"${gridStyle} onclick="openDayModal('${dateStr}')">${inner}</div>`;gridStyle='';
     }
     document.getElementById('cal-grid').innerHTML=html;
     renderWeekly();
@@ -239,7 +239,7 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
     document.getElementById('breakdown-rules').innerHTML=rs.length?rs.map(([r,c])=>`<div class="bar-row"><div class="bar-lbl">${r.substring(0,16)}</div><div class="bar-track"><div class="bar-fill win" style="width:${c/rmax*100}%"></div></div><div class="bar-n">${c}</div></div>`).join(''):'<div class="no-data">Log trades to see data</div>';
   }
 
-  function delTrade(id){if(!confirm('Delete this trade? 🌸'))return;trades=trades.filter(t=>t.id!==id);localStorage.setItem('tj_pink',JSON.stringify(trades));updateHeader();renderHistory();}
+  function delTrade(id){if(!confirm('Delete this trade? 🌸'))return;trades=trades.filter(t=>t.id!==id);localStorage.setItem('tj_pink',JSON.stringify(trades));updateHeader();renderHistory();renderCalendar();if(currentDay){const remaining=trades.filter(t=>t.date===currentDay);if(remaining.length)openDayModal(currentDay);else closeDayModal();}}
   function exportTrades(){
     if(!trades.length){alert('No trades to export yet 🌸');return;}
     const data=JSON.stringify(trades,null,2);
@@ -502,6 +502,53 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
 
   document.getElementById('edit-modal').addEventListener('click', function(e){
     if(e.target === this) closeEditModal();
+  });
+
+  // ── DAY MODAL ──
+  let currentDay = null;
+
+  function openDayModal(dateStr) {
+    const dayTrades = trades.filter(t => t.date === dateStr);
+    if(!dayTrades.length) return;
+    currentDay = dateStr;
+    const [year, month, day] = dateStr.split('-');
+    document.getElementById('day-modal-title').textContent = MONTHS[parseInt(month)-1] + ' ' + parseInt(day) + ', ' + year;
+    document.getElementById('day-modal-list').innerHTML = dayTrades.map(t => {
+      const pc = t.pnl > 0 ? 'w' : t.pnl < 0 ? 'l' : 'b';
+      const ps = (t.pnl >= 0 ? '+' : '') + '$' + t.pnl.toFixed(2);
+      const cc = t.pnl > 0 ? 'is-win' : t.pnl < 0 ? 'is-loss' : '';
+      const eTags = (t.emotions || []).map(e => `<span class="ttag ttag-emotion">${e}</span>`).join('');
+      const rTags = (t.rules || []).slice(0, 3).map(r => `<span class="ttag ttag-rule">${r.substring(0,26)}</span>`).join('');
+      const gc = t.grade === 'A' ? 'A' : t.grade === 'B' ? 'B' : '';
+      const gTag = t.grade ? `<span class="ttag ttag-grade ${gc}">Grade ${t.grade}</span>` : '';
+      return `<div class="trade-card ${cc}">
+        <div class="tc-top">
+          <div style="display:flex;align-items:center;gap:8px;"><span class="tc-ticker">${t.ticker}</span><span class="tc-dir ${t.direction==='CALL'?'call':'put'}">${t.direction}</span></div>
+          <div style="display:flex;align-items:center;gap:8px;"><span class="tc-pnl ${pc}">${ps}</span><button class="edit-btn" onclick="openEditModal(${t.id})" title="Edit">✎</button><button class="del-btn" onclick="delTrade(${t.id})">✕</button></div>
+        </div>
+        <div class="tc-meta">
+          <div class="tc-meta-item"><div class="tc-meta-lbl">Qty</div><div class="tc-meta-val">${t.contracts}x</div></div>
+          <div class="tc-meta-item"><div class="tc-meta-lbl">Entry</div><div class="tc-meta-val">$${t.entry.toFixed(2)}</div></div>
+          <div class="tc-meta-item"><div class="tc-meta-lbl">Exit</div><div class="tc-meta-val">$${t.exit.toFixed(2)}</div></div>
+          ${t.entryTime ? `<div class="tc-meta-item"><div class="tc-meta-lbl">In</div><div class="tc-meta-val">${t.entryTime}</div></div>` : ''}
+          ${t.exitTime ? `<div class="tc-meta-item"><div class="tc-meta-lbl">Out</div><div class="tc-meta-val">${t.exitTime}</div></div>` : ''}
+        </div>
+        ${gTag || rTags || eTags ? `<div class="tc-tags">${gTag}${rTags}${eTags}</div>` : ''}
+        ${t.what ? `<div class="tc-notes"><strong>What happened:</strong> ${t.what}</div>` : ''}
+      </div>`;
+    }).join('');
+    document.getElementById('day-modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeDayModal() {
+    document.getElementById('day-modal').classList.remove('open');
+    document.body.style.overflow = '';
+    currentDay = null;
+  }
+
+  document.getElementById('day-modal').addEventListener('click', function(e) {
+    if(e.target === this) closeDayModal();
   });
 
   renderRuleGrid();
