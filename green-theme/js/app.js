@@ -712,6 +712,111 @@ function closeRuleEditor() {
 renderRuleGrid();
 
 // ══════════════════════════════════════════
+// SETUP TYPES EDITOR
+// ══════════════════════════════════════════
+const DEFAULT_SETUPS = [
+  "Opening Range Breakout",
+  "VWAP Bounce",
+  "VWAP Rejection",
+  "Support Bounce",
+  "Resistance Rejection",
+  "Bull Flag",
+  "Bear Flag",
+  "Double Bottom",
+  "Double Top",
+  "Other",
+];
+let customSetups = JSON.parse(localStorage.getItem("tj_green_setups") || "null") || [
+  ...DEFAULT_SETUPS,
+];
+
+function renderSetupGrid() {
+  const html = customSetups
+    .map((s) => `<button class="setup-pill" onclick="togglePill(this)">${s}</button>`)
+    .join("");
+  const logGrid = document.getElementById("setup-grid");
+  const editGrid = document.getElementById("e-setup-grid");
+  if (logGrid) logGrid.innerHTML = html;
+  if (editGrid) editGrid.innerHTML = html;
+}
+
+function openSetupEditor() {
+  const list = document.getElementById("setup-editor-list");
+  list.innerHTML = customSetups
+    .map(
+      (s, i) => `
+      <div style="display:flex;align-items:center;gap:8px;" id="se-row-${i}">
+        <input type="text" value="${s.replace(/"/g, "&quot;")}" id="se-inp-${i}"
+          style="flex:1;background:var(--bg3);border:1.5px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--body);font-size:0.85rem;padding:9px 12px;outline:none;">
+        <button onclick="deleteSetupRow(${i})" style="background:none;border:1.5px solid var(--border);border-radius:6px;color:var(--text3);padding:8px 11px;cursor:pointer;font-size:0.8rem;transition:all 0.15s;"
+          onmouseover="this.style.color='var(--loss)';this.style.borderColor='var(--loss)';this.style.background='var(--loss-bg)'"
+          onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border)';this.style.background='none'">✕</button>
+      </div>`,
+    )
+    .join("");
+  document.getElementById("new-setup-input").value = "";
+  document.getElementById("setup-modal").style.display = "block";
+  document.body.style.overflow = "hidden";
+}
+
+function deleteSetupRow(i) {
+  document.getElementById("se-row-" + i).remove();
+  const rows = [...document.getElementById("setup-editor-list").children];
+  rows.forEach((row, idx) => {
+    row.id = "se-row-" + idx;
+    row.querySelector("input").id = "se-inp-" + idx;
+    row.querySelector("button").setAttribute("onclick", "deleteSetupRow(" + idx + ")");
+  });
+}
+
+function addSetup() {
+  const inp = document.getElementById("new-setup-input");
+  const val = inp.value.trim();
+  if (!val) return;
+  const list = document.getElementById("setup-editor-list");
+  const i = list.children.length;
+  const div = document.createElement("div");
+  div.style.cssText = "display:flex;align-items:center;gap:8px;";
+  div.id = "se-row-" + i;
+  div.innerHTML = `<input type="text" value="${val.replace(/"/g, "&quot;")}" id="se-inp-${i}"
+      style="flex:1;background:var(--bg3);border:1.5px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--body);font-size:0.85rem;padding:9px 12px;outline:none;">
+      <button onclick="deleteSetupRow(${i})" style="background:none;border:1.5px solid var(--border);border-radius:6px;color:var(--text3);padding:8px 11px;cursor:pointer;font-size:0.8rem;transition:all 0.15s;"
+        onmouseover="this.style.color='var(--loss)';this.style.borderColor='var(--loss)';this.style.background='var(--loss-bg)'"
+        onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border)';this.style.background='none'">✕</button>`;
+  list.appendChild(div);
+  inp.value = "";
+  inp.focus();
+}
+
+function saveSetups() {
+  const inputs = [...document.querySelectorAll("#setup-editor-list input[type=text]")];
+  customSetups = inputs.map((i) => i.value.trim()).filter(Boolean);
+  localStorage.setItem("tj_green_setups", JSON.stringify(customSetups));
+  closeSetupEditor();
+  renderSetupGrid();
+}
+
+function resetDefaultSetups() {
+  if (!confirm("Reset to default setup types? Your custom setups will be lost.")) return;
+  customSetups = [...DEFAULT_SETUPS];
+  localStorage.setItem("tj_green_setups", JSON.stringify(customSetups));
+  closeSetupEditor();
+  renderSetupGrid();
+}
+
+function closeSetupEditor() {
+  document.getElementById("setup-modal").style.display = "none";
+  document.body.style.overflow = "";
+}
+
+document.getElementById("setup-modal").addEventListener("click", function (e) {
+  if (e.target === this) closeSetupEditor();
+});
+
+// render setups on load
+renderSetupGrid();
+
+// ══════════════════════════════════════════
 // EDIT TRADE MODAL
 // ══════════════════════════════════════════
 let editingId = null;
@@ -756,8 +861,12 @@ function openEditModal(id) {
   document.getElementById("e-entry-time").value = t.entryTime || "";
   document.getElementById("e-exit-time").value = t.exitTime || "";
   // restore setup pills
-  document.querySelectorAll("#e-setup-grid .setup-pill").forEach((b) => {
-    const setups = Array.isArray(t.setup) ? t.setup : t.setup ? [t.setup] : [];
+  const setups = Array.isArray(t.setup) ? t.setup : t.setup ? [t.setup] : [];
+  const editSetupGrid = document.getElementById("e-setup-grid");
+  editSetupGrid.innerHTML = customSetups
+    .map((s) => `<button class="setup-pill" onclick="togglePill(this)">${s}</button>`)
+    .join("");
+  editSetupGrid.querySelectorAll(".setup-pill").forEach((b) => {
     b.classList.toggle("on", setups.includes(b.textContent.trim()));
   });
   document.getElementById("e-what").value = t.what || "";
@@ -896,6 +1005,7 @@ function openDayModal(dateStr) {
   document.getElementById("day-modal-title").textContent = title;
   const listEl = document.getElementById("day-modal-list");
   const dayTrades = trades.filter((t) => t.date === dateStr);
+  const addTradeBtn = `<div style="display:flex;justify-content:flex-end;margin-bottom:10px;"><button class="day-add-cta" onclick="openLogWithDate('${dateStr}')">＋ Add Trade</button></div>`;
   if (!dayTrades.length) {
     listEl.innerHTML = `<div class="empty" style="padding:24px 0;text-align:center;">
          <div class="empty-sub" style="margin-bottom:12px">No trades for ${dateStr}</div>
@@ -903,7 +1013,7 @@ function openDayModal(dateStr) {
        </div>`;
   } else {
     const compact = dayTrades.length > 4; // switch to compact when busy
-    listEl.innerHTML = dayTrades
+    listEl.innerHTML = addTradeBtn + dayTrades
       .map((t) => {
         const pc = t.pnl > 0 ? "w" : t.pnl < 0 ? "l" : "b";
         const ps = (t.pnl >= 0 ? "+" : "") + "$" + t.pnl.toFixed(2);

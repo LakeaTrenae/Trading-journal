@@ -346,6 +346,75 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
     document.getElementById('h-pnl').className='hstat-value '+(pnl>=0?'win':'loss');
   }
 
+  const DEFAULT_SETUPS = [
+    'Opening Range Breakout',
+    'VWAP Bounce',
+    'VWAP Rejection',
+    'Support Bounce',
+    'Resistance Rejection',
+    'Bull Flag',
+    'Bear Flag',
+    'Double Bottom',
+    'Double Top',
+    'Other'
+  ];
+
+  let customSetups = JSON.parse(localStorage.getItem('tj_pink_setups') || 'null');
+  if(!customSetups) customSetups = [...DEFAULT_SETUPS];
+
+  function renderSetupGrid(){
+    const html = customSetups.map(s=>`<button class="setup-pill" onclick="togglePill(this)">${s}</button>`).join('');
+    const logGrid = document.getElementById('setup-grid');
+    const editGrid = document.getElementById('e-setup-grid');
+    if(logGrid) logGrid.innerHTML = html;
+    if(editGrid) editGrid.innerHTML = html;
+  }
+
+  function openSetupsModal(){
+    const list = document.getElementById('setup-edit-list');
+    list.innerHTML = customSetups.map((s,i)=>`
+      <div class="rule-edit-row" data-index="${i}">
+        <input type="text" value="${s.replace(/"/g,'&quot;')}" placeholder="Setup name..." />
+        <button class="rule-del-btn" onclick="removeSetupField(${i})" title="Remove">✕</button>
+      </div>`).join('');
+    document.getElementById('setups-modal').classList.add('open');
+  }
+
+  function closeSetupsModal(){
+    document.getElementById('setups-modal').classList.remove('open');
+  }
+
+  function addSetupField(){
+    const list = document.getElementById('setup-edit-list');
+    const row = document.createElement('div');
+    row.className = 'rule-edit-row';
+    row.innerHTML = `<input type="text" placeholder="Type your setup name..." /><button class="rule-del-btn" onclick="this.parentElement.remove()" title="Remove">✕</button>`;
+    list.appendChild(row);
+    row.querySelector('input').focus();
+  }
+
+  function removeSetupField(i){
+    document.querySelectorAll('#setup-edit-list .rule-edit-row')[i]?.remove();
+  }
+
+  function saveSetups(){
+    const rows = document.querySelectorAll('#setup-edit-list .rule-edit-row input');
+    const newSetups = [];
+    rows.forEach(input=>{
+      const val = input.value.trim();
+      if(val) newSetups.push(val);
+    });
+    if(!newSetups.length){ alert('Add at least one setup type 🌸'); return; }
+    customSetups = newSetups;
+    localStorage.setItem('tj_pink_setups', JSON.stringify(customSetups));
+    renderSetupGrid();
+    closeSetupsModal();
+  }
+
+  document.getElementById('setups-modal').addEventListener('click', function(e){
+    if(e.target === this) closeSetupsModal();
+  });
+
   const DEFAULT_RULES = [
     { label: "Waited for 15-min opening range to form",     key: "Waited for 15-min ORB to form" },
     { label: "Candle closed beyond level — not just a wick", key: "Candle closed beyond level (Break & Hold)" },
@@ -455,7 +524,9 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
     calcEditPnl();
 
     const setups = Array.isArray(t.setup) ? t.setup : (t.setup ? [t.setup] : []);
-    document.querySelectorAll('#e-setup-grid .setup-pill').forEach(b=>{
+    const editSetupGrid = document.getElementById('e-setup-grid');
+    editSetupGrid.innerHTML = customSetups.map(s=>`<button class="setup-pill" onclick="togglePill(this)">${s}</button>`).join('');
+    editSetupGrid.querySelectorAll('.setup-pill').forEach(b=>{
       b.classList.toggle('on', setups.includes(b.textContent.trim()));
     });
 
@@ -540,6 +611,7 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
     if(e.target === this) closeEditModal();
   });
 
+  renderSetupGrid();
   renderRuleGrid();
   updateHeader();
   renderCalendar();
