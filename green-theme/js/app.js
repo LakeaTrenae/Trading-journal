@@ -1005,6 +1005,7 @@ function openDayModal(dateStr) {
   document.getElementById("day-modal-title").textContent = title;
   const listEl = document.getElementById("day-modal-list");
   const dayTrades = trades.filter((t) => t.date === dateStr);
+  const addTradeBtn = `<div style="display:flex;justify-content:flex-end;margin-bottom:10px;"><button class="day-add-cta" onclick="openLogWithDate('${dateStr}')">＋ Add Trade</button></div>`;
   if (!dayTrades.length) {
     listEl.innerHTML = `<div class="empty" style="padding:24px 0;text-align:center;">
          <div class="empty-sub" style="margin-bottom:12px">No trades for ${dateStr}</div>
@@ -1012,7 +1013,7 @@ function openDayModal(dateStr) {
        </div>`;
   } else {
     const compact = dayTrades.length > 4; // switch to compact when busy
-    listEl.innerHTML = dayTrades
+    listEl.innerHTML = addTradeBtn + dayTrades
       .map((t) => {
         const pc = t.pnl > 0 ? "w" : t.pnl < 0 ? "l" : "b";
         const ps = (t.pnl >= 0 ? "+" : "") + "$" + t.pnl.toFixed(2);

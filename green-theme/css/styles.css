@@ -954,6 +954,26 @@ main {
   color: var(--green1) !important;
   background: var(--green-bg) !important;
 }
+.day-add-cta {
+  background: var(--green-bg);
+  color: var(--green2);
+  border: 1.5px solid var(--green-mid);
+  border-radius: 6px;
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 7px 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-weight: 700;
+}
+.day-add-cta:hover {
+  background: var(--green1);
+  border-color: var(--green1);
+  color: #fff;
+  transform: translateY(-1px);
+}
 /* ── MODAL OVERLAY ── */
 .modal-overlay {
   display: none;
