@@ -116,19 +116,12 @@
       <div class="form-grid-3">
         <div class="field"><label>Entry Time</label><input type="time" id="f-entry-time"></div>
         <div class="field"><label>Exit Time</label><input type="time" id="f-exit-time"></div>
-        <div class="field" style="grid-column:1/-1;"><label>Setup Type(s)</label>
-          <div class="setup-pill-grid" id="setup-grid">
-        <button class="setup-pill" onclick="togglePill(this)">Opening Range Breakout</button>
-        <button class="setup-pill" onclick="togglePill(this)">VWAP Bounce</button>
-        <button class="setup-pill" onclick="togglePill(this)">VWAP Rejection</button>
-        <button class="setup-pill" onclick="togglePill(this)">Support Bounce</button>
-        <button class="setup-pill" onclick="togglePill(this)">Resistance Rejection</button>
-        <button class="setup-pill" onclick="togglePill(this)">Bull Flag</button>
-        <button class="setup-pill" onclick="togglePill(this)">Bear Flag</button>
-        <button class="setup-pill" onclick="togglePill(this)">Double Bottom</button>
-        <button class="setup-pill" onclick="togglePill(this)">Double Top</button>
-        <button class="setup-pill" onclick="togglePill(this)">Other</button>
+        <div class="field" style="grid-column:1/-1;">
+          <div class="block-label-row" style="margin-bottom:6px;">
+            <label style="margin-bottom:0;">Setup Type(s)</label>
+            <button class="edit-rules-link" onclick="openSetupsModal()">✏️ Edit Setups</button>
           </div>
+          <div class="setup-pill-grid" id="setup-grid"></div>
         </div>
       </div>
     </div>
@@ -231,6 +224,20 @@
   </div>
 
 
+<!-- Editable Setups Modal -->
+<div class="modal-overlay" id="setups-modal">
+  <div class="modal">
+    <div class="modal-title">Edit Your Setup Types 📊</div>
+    <div class="modal-sub">Customise the setup types to match your trading style</div>
+    <div class="rule-edit-list" id="setup-edit-list"></div>
+    <button class="add-rule-btn" onclick="addSetupField()">+ Add a Setup</button>
+    <div class="modal-actions">
+      <button class="modal-cancel-btn" onclick="closeSetupsModal()">Cancel</button>
+      <button class="modal-save-btn" onclick="saveSetups()">Save Setups</button>
+    </div>
+  </div>
+</div>
+
 <!-- Editable Rules Modal -->
 <div class="modal-overlay" id="rules-modal">
   <div class="modal">
@@ -299,19 +306,12 @@
     <div class="form-grid-3" style="margin-bottom:12px;">
       <div class="field"><label>Entry Time</label><input type="time" id="e-entry-time"></div>
       <div class="field"><label>Exit Time</label><input type="time" id="e-exit-time"></div>
-      <div class="field" style="grid-column:1/-1;"><label>Setup Type(s)</label>
-        <div class="setup-pill-grid" id="e-setup-grid">
-        <button class="setup-pill" onclick="togglePill(this)">Opening Range Breakout</button>
-        <button class="setup-pill" onclick="togglePill(this)">VWAP Bounce</button>
-        <button class="setup-pill" onclick="togglePill(this)">VWAP Rejection</button>
-        <button class="setup-pill" onclick="togglePill(this)">Support Bounce</button>
-        <button class="setup-pill" onclick="togglePill(this)">Resistance Rejection</button>
-        <button class="setup-pill" onclick="togglePill(this)">Bull Flag</button>
-        <button class="setup-pill" onclick="togglePill(this)">Bear Flag</button>
-        <button class="setup-pill" onclick="togglePill(this)">Double Bottom</button>
-        <button class="setup-pill" onclick="togglePill(this)">Double Top</button>
-        <button class="setup-pill" onclick="togglePill(this)">Other</button>
+      <div class="field" style="grid-column:1/-1;">
+        <div class="block-label-row" style="margin-bottom:6px;">
+          <label style="margin-bottom:0;">Setup Type(s)</label>
+          <button class="edit-rules-link" onclick="openSetupsModal()">✏️ Edit Setups</button>
         </div>
+        <div class="setup-pill-grid" id="e-setup-grid"></div>
       </div>
     </div>
 
