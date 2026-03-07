@@ -125,7 +125,8 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
     const dayTrades = trades.filter(t => t.date === dateStr);
     const [year, month, day] = dateStr.split('-');
     document.getElementById('day-modal-title').textContent = `${MONTHS[parseInt(month)-1]} ${parseInt(day)}, ${year}`;
-    document.getElementById('day-modal-list').innerHTML = dayTrades.length ? dayTrades.map(t => {
+    const addTradeBtn = `<div style="display:flex;justify-content:flex-end;margin-bottom:10px;"><button class="day-add-cta" onclick="startLogFromDate('${dateStr}')">＋ Add Trade</button></div>`;
+    document.getElementById('day-modal-list').innerHTML = dayTrades.length ? addTradeBtn + dayTrades.map(t => {
       const pc=t.pnl>0?'w':t.pnl<0?'l':'b';
       const ps=(t.pnl>=0?'+':'')+'$'+t.pnl.toFixed(2);
       const cc=t.pnl>0?'is-win':t.pnl<0?'is-loss':'';
@@ -149,12 +150,20 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
         ${paperTag?`<div class="tc-tags">${paperTag}</div>`:''}
         ${t.what?`<div class="tc-notes"><strong>What happened:</strong> ${t.what}</div>`:''}
       </div>`;
-    }).join('') : '<div class="empty" style="padding:24px 0;"><div class="empty-icon">🌸</div><div class="empty-title">No trades for this day</div><div class="empty-sub">Log a trade to see it here</div></div>';
+    }).join('') : `<div class="day-empty-wrap"><div class="empty" style="padding:8px 0;"><div class="empty-icon">🌸</div><div class="empty-title">No trades for this day</div><div class="empty-sub">Log a trade to see it here</div></div><button class="day-empty-cta" onclick="startLogFromDate('${dateStr}')">Log Trade for This Date</button></div>`;
     const modal = document.getElementById('day-modal');
     modal.style.display = 'flex';
     modal.style.alignItems = 'center';
     modal.style.justifyContent = 'center';
     modal.style.padding = '16px';
+  }
+
+  function startLogFromDate(dateStr){
+    closeDayModal();
+    goTab('log');
+    const inp=document.getElementById('f-date');
+    if(inp) inp.value=dateStr;
+    window.scrollTo(0,0);
   }
 
   function closeDayModal(){

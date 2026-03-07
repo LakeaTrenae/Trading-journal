@@ -298,7 +298,7 @@
   .cal-day {
     height:72px;
     border-radius:12px;
-    display:flex; flex-direction:col98umn; align-items:center; justify-content:center;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
     cursor:pointer;
     transition:all 0.15s;
     background:var(--bg2);
@@ -387,14 +387,6 @@
   ══════════════════════════════════════════ */
   .modal-overlay { display:none; position:fixed; inset:0; background:rgba(58,32,48,0.45); z-index:500; align-items:center; justify-content:center; padding:16px; }
   .modal-overlay.open { display:flex; }
-  .modal-box {
-    background:var(--bg2);
-    border:1.5px solid var(--border);
-    border-radius:20px;
-    padding:24px;
-    width:100%;
-    box-shadow:0 20px 60px rgba(240,160,180,0.3);
-  }
   .modal { background:var(--bg2); border:1.5px solid var(--border); border-radius:20px; padding:28px; width:100%; max-width:560px; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(240,160,180,0.3); }
   .modal-close-btn {
     background:var(--petal);
@@ -412,6 +404,37 @@
     transition:all 0.15s;
   }
   .modal-close-btn:hover { background:var(--pink2); border-color:var(--pink2); color:white; transform:translateY(-1px); }
+  .day-add-cta {
+    background:var(--petal);
+    color:var(--pink2);
+    border:1.5px solid var(--pink3);
+    border-radius:12px;
+    font-family:var(--mono);
+    font-size:0.62rem;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    padding:10px 14px;
+    cursor:pointer;
+    transition:all 0.16s;
+    font-weight:700;
+  }
+  .day-add-cta:hover { background:var(--pink2); border-color:var(--pink2); color:#fff; transform:translateY(-1px); }
+  .day-empty-wrap { display:flex; flex-direction:column; align-items:center; gap:10px; padding:10px 0 2px; }
+  .day-empty-cta {
+    background:var(--petal);
+    color:var(--pink2);
+    border:1.5px solid var(--pink3);
+    border-radius:12px;
+    font-family:var(--mono);
+    font-size:0.58rem;
+    letter-spacing:1.8px;
+    text-transform:uppercase;
+    padding:10px 14px;
+    cursor:pointer;
+    transition:all 0.16s;
+    font-weight:700;
+  }
+  .day-empty-cta:hover { background:var(--pink2); border-color:var(--pink2); color:#fff; transform:translateY(-1px); }
   .modal-title { font-family:var(--heading); font-size:1.4rem; font-style:italic; color:var(--text); margin-bottom:4px; }
   .modal-sub { font-size:0.68rem; color:var(--text3); margin-bottom:20px; font-weight:500; }
   .rule-edit-list { display:flex; flex-direction:column; gap:8px; margin-bottom:18px; }
@@ -431,49 +454,6 @@
   .edit-rules-link:hover { opacity:1; }
   .block-label-row { display:flex; align-items:center; width:100%; gap:10px; margin-bottom:14px; }
   .block-label-row .block-label { margin-bottom:0; flex:1; }
-  .day-empty-wrap {
-    background:var(--bg3);
-    border:1.5px dashed var(--pink1);
-    border-radius:14px;
-    padding:10px 10px;
-    margin-top:4px;
-    text-align:center;
-  }
-  .day-empty-wrap .empty { padding:4px 0 !important; }
-  .day-empty-wrap .empty-icon { font-size:1.5rem; margin-bottom:6px; }
-  .day-empty-wrap .empty-title { color:var(--pink3); font-size:1rem; margin-bottom:4px; }
-  .day-empty-wrap .empty-sub { color:var(--text2); font-size:0.66rem; }
-  .day-empty-cta {
-    margin-top:8px;
-    background:linear-gradient(135deg,var(--pink2),var(--pink3));
-    color:#fff;
-    border:none;
-    border-radius:8px;
-    font-family:var(--body);
-    font-size:0.62rem;
-    font-weight:800;
-    letter-spacing:1.2px;
-    text-transform:uppercase;
-    padding:8px 12px;
-    cursor:pointer;
-    box-shadow:0 3px 10px rgba(244,114,160,0.28);
-  }
-  .day-empty-cta:hover { opacity:0.9; transform:translateY(-1px); }
-  .day-add-cta {
-    background:var(--petal);
-    color:var(--pink3);
-    border:1.5px solid var(--pink1);
-    border-radius:8px;
-    font-family:var(--body);
-    font-size:0.6rem;
-    font-weight:800;
-    letter-spacing:1px;
-    text-transform:uppercase;
-    padding:7px 10px;
-    cursor:pointer;
-    transition:all 0.15s;
-  }
-  .day-add-cta:hover { background:var(--pink2); border-color:var(--pink2); color:#fff; transform:translateY(-1px); }
 
   /* ══════════════════════════════════════════
      RESPONSIVE — TABLET (≤900px)
@@ -725,19 +705,12 @@
       <div class="form-grid-3">
         <div class="field"><label>Entry Time</label><input type="time" id="f-entry-time"></div>
         <div class="field"><label>Exit Time</label><input type="time" id="f-exit-time"></div>
-        <div class="field" style="grid-column:1/-1;"><label>Setup Type(s)</label>
-          <div class="setup-pill-grid" id="setup-grid">
-        <button class="setup-pill" onclick="togglePill(this)">Opening Range Breakout</button>
-        <button class="setup-pill" onclick="togglePill(this)">VWAP Bounce</button>
-        <button class="setup-pill" onclick="togglePill(this)">VWAP Rejection</button>
-        <button class="setup-pill" onclick="togglePill(this)">Support Bounce</button>
-        <button class="setup-pill" onclick="togglePill(this)">Resistance Rejection</button>
-        <button class="setup-pill" onclick="togglePill(this)">Bull Flag</button>
-        <button class="setup-pill" onclick="togglePill(this)">Bear Flag</button>
-        <button class="setup-pill" onclick="togglePill(this)">Double Bottom</button>
-        <button class="setup-pill" onclick="togglePill(this)">Double Top</button>
-        <button class="setup-pill" onclick="togglePill(this)">Other</button>
+        <div class="field" style="grid-column:1/-1;">
+          <div class="block-label-row" style="margin-bottom:6px;">
+            <label style="margin-bottom:0;">Setup Type(s)</label>
+            <button class="edit-rules-link" onclick="openSetupsModal()">✏️ Edit Setups</button>
           </div>
+          <div class="setup-pill-grid" id="setup-grid"></div>
         </div>
       </div>
     </div>
@@ -840,6 +813,20 @@
   </div>
 
 
+<!-- Editable Setups Modal -->
+<div class="modal-overlay" id="setups-modal">
+  <div class="modal">
+    <div class="modal-title">Edit Your Setup Types 📊</div>
+    <div class="modal-sub">Customise the setup types to match your trading style</div>
+    <div class="rule-edit-list" id="setup-edit-list"></div>
+    <button class="add-rule-btn" onclick="addSetupField()">+ Add a Setup</button>
+    <div class="modal-actions">
+      <button class="modal-cancel-btn" onclick="closeSetupsModal()">Cancel</button>
+      <button class="modal-save-btn" onclick="saveSetups()">Save Setups</button>
+    </div>
+  </div>
+</div>
+
 <!-- Editable Rules Modal -->
 <div class="modal-overlay" id="rules-modal">
   <div class="modal">
@@ -908,19 +895,12 @@
     <div class="form-grid-3" style="margin-bottom:12px;">
       <div class="field"><label>Entry Time</label><input type="time" id="e-entry-time"></div>
       <div class="field"><label>Exit Time</label><input type="time" id="e-exit-time"></div>
-      <div class="field" style="grid-column:1/-1;"><label>Setup Type(s)</label>
-        <div class="setup-pill-grid" id="e-setup-grid">
-        <button class="setup-pill" onclick="togglePill(this)">Opening Range Breakout</button>
-        <button class="setup-pill" onclick="togglePill(this)">VWAP Bounce</button>
-        <button class="setup-pill" onclick="togglePill(this)">VWAP Rejection</button>
-        <button class="setup-pill" onclick="togglePill(this)">Support Bounce</button>
-        <button class="setup-pill" onclick="togglePill(this)">Resistance Rejection</button>
-        <button class="setup-pill" onclick="togglePill(this)">Bull Flag</button>
-        <button class="setup-pill" onclick="togglePill(this)">Bear Flag</button>
-        <button class="setup-pill" onclick="togglePill(this)">Double Bottom</button>
-        <button class="setup-pill" onclick="togglePill(this)">Double Top</button>
-        <button class="setup-pill" onclick="togglePill(this)">Other</button>
+      <div class="field" style="grid-column:1/-1;">
+        <div class="block-label-row" style="margin-bottom:6px;">
+          <label style="margin-bottom:0;">Setup Type(s)</label>
+          <button class="edit-rules-link" onclick="openSetupsModal()">✏️ Edit Setups</button>
         </div>
+        <div class="setup-pill-grid" id="e-setup-grid"></div>
       </div>
     </div>
 
@@ -1141,17 +1121,16 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
     modal.style.padding = '16px';
   }
 
-  function closeDayModal(){
-    document.getElementById('day-modal').style.display = 'none';
-  }
-
   function startLogFromDate(dateStr){
     closeDayModal();
     goTab('log');
-    const dateField = document.getElementById('f-date');
-    if(dateField) dateField.value = dateStr;
-    const tickerField = document.getElementById('f-ticker');
-    if(tickerField) tickerField.focus();
+    const inp=document.getElementById('f-date');
+    if(inp) inp.value=dateStr;
+    window.scrollTo(0,0);
+  }
+
+  function closeDayModal(){
+    document.getElementById('day-modal').style.display = 'none';
   }
 
   document.getElementById('day-modal').addEventListener('click', function(e){
@@ -1339,6 +1318,75 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
     document.getElementById('h-pnl').className='hstat-value '+(pnl>=0?'win':'loss');
   }
 
+  const DEFAULT_SETUPS = [
+    'Opening Range Breakout',
+    'VWAP Bounce',
+    'VWAP Rejection',
+    'Support Bounce',
+    'Resistance Rejection',
+    'Bull Flag',
+    'Bear Flag',
+    'Double Bottom',
+    'Double Top',
+    'Other'
+  ];
+
+  let customSetups = JSON.parse(localStorage.getItem('tj_pink_setups') || 'null');
+  if(!customSetups) customSetups = [...DEFAULT_SETUPS];
+
+  function renderSetupGrid(){
+    const html = customSetups.map(s=>`<button class="setup-pill" onclick="togglePill(this)">${s}</button>`).join('');
+    const logGrid = document.getElementById('setup-grid');
+    const editGrid = document.getElementById('e-setup-grid');
+    if(logGrid) logGrid.innerHTML = html;
+    if(editGrid) editGrid.innerHTML = html;
+  }
+
+  function openSetupsModal(){
+    const list = document.getElementById('setup-edit-list');
+    list.innerHTML = customSetups.map((s,i)=>`
+      <div class="rule-edit-row" data-index="${i}">
+        <input type="text" value="${s.replace(/"/g,'&quot;')}" placeholder="Setup name..." />
+        <button class="rule-del-btn" onclick="removeSetupField(${i})" title="Remove">✕</button>
+      </div>`).join('');
+    document.getElementById('setups-modal').classList.add('open');
+  }
+
+  function closeSetupsModal(){
+    document.getElementById('setups-modal').classList.remove('open');
+  }
+
+  function addSetupField(){
+    const list = document.getElementById('setup-edit-list');
+    const row = document.createElement('div');
+    row.className = 'rule-edit-row';
+    row.innerHTML = `<input type="text" placeholder="Type your setup name..." /><button class="rule-del-btn" onclick="this.parentElement.remove()" title="Remove">✕</button>`;
+    list.appendChild(row);
+    row.querySelector('input').focus();
+  }
+
+  function removeSetupField(i){
+    document.querySelectorAll('#setup-edit-list .rule-edit-row')[i]?.remove();
+  }
+
+  function saveSetups(){
+    const rows = document.querySelectorAll('#setup-edit-list .rule-edit-row input');
+    const newSetups = [];
+    rows.forEach(input=>{
+      const val = input.value.trim();
+      if(val) newSetups.push(val);
+    });
+    if(!newSetups.length){ alert('Add at least one setup type 🌸'); return; }
+    customSetups = newSetups;
+    localStorage.setItem('tj_pink_setups', JSON.stringify(customSetups));
+    renderSetupGrid();
+    closeSetupsModal();
+  }
+
+  document.getElementById('setups-modal').addEventListener('click', function(e){
+    if(e.target === this) closeSetupsModal();
+  });
+
   const DEFAULT_RULES = [
     { label: "Waited for 15-min opening range to form",     key: "Waited for 15-min ORB to form" },
     { label: "Candle closed beyond level — not just a wick", key: "Candle closed beyond level (Break & Hold)" },
@@ -1448,7 +1496,9 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
     calcEditPnl();
 
     const setups = Array.isArray(t.setup) ? t.setup : (t.setup ? [t.setup] : []);
-    document.querySelectorAll('#e-setup-grid .setup-pill').forEach(b=>{
+    const editSetupGrid = document.getElementById('e-setup-grid');
+    editSetupGrid.innerHTML = customSetups.map(s=>`<button class="setup-pill" onclick="togglePill(this)">${s}</button>`).join('');
+    editSetupGrid.querySelectorAll('.setup-pill').forEach(b=>{
       b.classList.toggle('on', setups.includes(b.textContent.trim()));
     });
 
@@ -1533,11 +1583,11 @@ let trades = JSON.parse(localStorage.getItem('tj_pink') || '[]');
     if(e.target === this) closeEditModal();
   });
 
+  renderSetupGrid();
   renderRuleGrid();
   updateHeader();
   renderCalendar();
 
 </script>
-
 </body>
 </html>
